@@ -1,0 +1,950 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ブラックジャック練習帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Zen+Kaku+Gothic+New:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one column workbook — rules bar, three tabs (drill / table play / chart); the felt table is the hero of each tab. */
+:root {
+  --bg: #f2f4f1;
+  --panel: #ffffff;
+  --fg: #18211c;
+  --dim: #5c665f;
+  --line: #d6ddd7;
+  --felt: #145a3c;
+  --felt-2: #0f4a31;
+  --felt-ink: #e8f1ea;
+  --gold: #b8892b;
+  --accent: #145a3c;
+  --ok: #1d7a43; --ng: #c0392b;
+  --cH: #f3d9d4; --cS: #f6e7b7; --cD: #c9e3cf; --cP: #cdddf3; --cR: #e2d7ef;
+  --cell-ink: #18211c;
+  --f-card: "DM Serif Display", Georgia, "Times New Roman", serif;
+  --f-body: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111613; --panel: #1a211c; --fg: #e4ebe5; --dim: #9aa69d; --line: #2d3830;
+  --felt: #12513a; --felt-2: #0c3d2b; --accent: #5cc48b; --gold: #d9ad55;
+  --ok: #5cc48b; --ng: #ff7a6b;
+  --cH: #5a2e2a; --cS: #5a4b1f; --cD: #24503a; --cP: #283f63; --cR: #45365c; --cell-ink: #eef2ee; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111613; --panel: #1a211c; --fg: #e4ebe5; --dim: #9aa69d; --line: #2d3830;
+  --felt: #12513a; --felt-2: #0c3d2b; --accent: #5cc48b; --gold: #d9ad55;
+  --ok: #5cc48b; --ng: #ff7a6b;
+  --cH: #5a2e2a; --cS: #5a4b1f; --cD: #24503a; --cP: #283f63; --cR: #45365c; --cell-ink: #eef2ee; color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 780px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 16px; }
+header h1 { margin: 0; font-size: 24px; text-wrap: balance; }
+header h1 .suit { color: var(--ng); }
+header p { margin: 2px 0 0; color: var(--dim); font-size: 13px; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* Rules */
+.rules { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 10px; }
+.rules-top { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+.rules-top strong { font-size: 14px; }
+.edge { font-size: 13px; color: var(--dim); }
+.edge b { font-family: var(--f-mono); color: var(--fg); font-size: 15px; }
+.presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 3px 12px; font-size: 13px; }
+.chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.toggles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+@media (max-width: 560px) { .toggles { grid-template-columns: minmax(0, 1fr); } }
+.tg { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.seg button { border: 0; background: transparent; color: var(--fg); padding: 3px 10px; font-size: 12px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--panel); font-weight: 700; }
+.fine { font-size: 12px; color: var(--dim); margin: 0; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs button { border: 0; background: none; color: var(--dim); padding: 8px 14px; font-weight: 700; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--gold); }
+
+/* Felt table */
+.felt { background: radial-gradient(ellipse at 50% 0%, var(--felt), var(--felt-2) 80%); color: var(--felt-ink); border-radius: 16px; padding: 16px; display: grid; gap: 14px; border: 2px solid color-mix(in srgb, var(--gold) 60%, transparent); }
+.spot { display: grid; gap: 6px; justify-items: center; }
+.spot .who { font-size: 11px; letter-spacing: .16em; opacity: .75; }
+.spot .tot { font-family: var(--f-mono); font-size: 13px; opacity: .9; min-height: 1.4em; }
+.hands { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+.hand { display: grid; gap: 4px; justify-items: center; padding: 6px 8px; border-radius: 10px; border: 2px solid transparent; }
+.hand.active { border-color: var(--gold); }
+.hand .res { font-size: 12px; font-weight: 700; min-height: 1.3em; }
+.cards { display: flex; min-height: 92px; }
+.card { width: 62px; height: 88px; border-radius: 7px; background: #fbfaf6; color: #1b1b1b; box-shadow: 0 2px 6px rgba(0,0,0,.35); position: relative; font-family: var(--f-card); flex-shrink: 0; }
+.card + .card { margin-left: -22px; }
+.card.red { color: #c22a2a; }
+.card .r { position: absolute; top: 4px; left: 6px; font-size: 20px; line-height: 1; }
+.card .s { position: absolute; top: 24px; left: 6px; font-size: 14px; line-height: 1; }
+.card .c { position: absolute; right: 7px; bottom: 4px; font-size: 30px; line-height: 1; }
+.card.back { background: repeating-linear-gradient(45deg, #7d1f24 0 6px, #96292f 6px 12px); border: 3px solid #fbfaf6; }
+@media (max-width: 400px) { .card { width: 54px; height: 78px; } .card .c { font-size: 26px; } .cards { min-height: 82px; } }
+
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+.act { border: 0; border-radius: 10px; padding: 10px 6px; font-weight: 700; font-size: 15px; background: #fbfaf6; color: #18211c; box-shadow: 0 3px 0 rgba(0,0,0,.35); }
+.act small { display: block; font-weight: 400; font-size: 11px; opacity: .7; font-family: var(--f-mono); }
+.act:disabled { opacity: .35; cursor: not-allowed; }
+.act:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.35); }
+.act.primary { background: var(--gold); color: #1b1405; }
+
+/* Feedback */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.verdict { font-size: 18px; font-weight: 700; }
+.verdict.ok { color: var(--ok); } .verdict.ng { color: var(--ng); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+th { font-size: 11px; color: var(--dim); font-weight: 400; }
+th:first-child, td:first-child { text-align: left; }
+td.num { font-family: var(--f-mono); }
+tr.best td { font-weight: 700; color: var(--ok); }
+tr.mine td:first-child::after { content: "（あなた）"; font-weight: 400; color: var(--dim); font-size: 12px; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--dim); align-items: center; }
+.stats b { font-family: var(--f-mono); color: var(--fg); font-size: 15px; font-weight: 600; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 8px; padding: 6px 14px; font-size: 14px; }
+.btn.main { background: var(--accent); color: var(--panel); border-color: var(--accent); font-weight: 700; }
+.weak { margin: 0; padding-left: 1.2em; font-size: 13px; }
+.weak li { margin: 2px 0; }
+.toast { min-height: 1.5em; font-size: 13px; text-align: center; }
+.toast.ng { color: #ffd1c9; } .toast.ok { color: #c9f0d6; }
+.why { font-size: 13px; line-height: 1.6; text-align: left; opacity: .92; max-width: 560px; justify-self: center; }
+.why:empty { display: none; }
+.bets { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.bets button { border-radius: 999px; width: 52px; height: 52px; border: 3px dashed #fbfaf6; background: #2a3b8f; color: #fff; font-family: var(--f-mono); font-weight: 600; }
+.bets button:nth-child(2) { background: #1d7a43; } .bets button:nth-child(3) { background: #111; } .bets button:nth-child(4) { background: #7b2a8f; }
+.bets button[aria-pressed="true"] { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* Chart */
+.chart-wrap { overflow-x: auto; }
+.chart { border-collapse: separate; border-spacing: 2px; width: 100%; min-width: 480px; }
+.chart th { text-align: center; font-family: var(--f-mono); font-size: 12px; color: var(--dim); padding: 3px; border: 0; }
+.chart th.rowh { text-align: left; white-space: nowrap; color: var(--fg); font-family: var(--f-body); font-weight: 700; }
+.chart td { text-align: center; font-family: var(--f-mono); font-size: 12px; font-weight: 600; padding: 5px 2px; border: 0; border-radius: 4px; color: var(--cell-ink); }
+.c-H { background: var(--cH); } .c-S { background: var(--cS); } .c-D { background: var(--cD); } .c-P { background: var(--cP); } .c-R { background: var(--cR); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 26px; text-align: center; font-style: normal; font-family: var(--f-mono); font-weight: 600; border-radius: 4px; padding: 1px 0; color: var(--cell-ink); }
+h2 { font-size: 15px; margin: 0; }
+.tablerules { font-size: 13px; border-top: 1px solid var(--line); padding-top: 8px; }
+.tablerules summary { cursor: pointer; font-weight: 700; }
+.tablerules ul { margin: 6px 0 0; padding-left: 1.2em; }
+.tablerules li { margin: 2px 0; }
+.pick { display: grid; grid-template-columns: repeat(10, minmax(0,1fr)); gap: 6px; margin: 6px 0 12px; }
+@media (max-width: 480px) { .pick { grid-template-columns: repeat(5, minmax(0,1fr)); } }
+.pick button { border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 8px; padding: 10px 0; font-family: var(--f-card); font-size: 20px; }
+.pick button[aria-pressed="true"] { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.jopt { font-size: 13px; display: inline-flex; gap: 6px; align-items: center; margin-left: auto; }
+.verdict.big { font-size: 26px; }
+[hidden] { display: none !important; }
+.chart { table-layout: fixed; }
+.chart th.rowh, .chart thead th:first-child { width: 104px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><span class="suit">♥</span>♠ ブラックジャック練習帳</h1>
+    <p>実際のテーブルに出る前に、ベーシックストラテジーを体に入れるための練習用。チップは仮のものです。</p>
+  </header>
+  <div id="authBar"></div>
+
+  <section class="rules" aria-label="テーブルのルール">
+    <div class="rules-top">
+      <strong>テーブルのルール</strong>
+      <div class="presets">
+        <button class="chip" type="button" data-preset="table1">アトランティックルール</button>
+        <button class="chip" type="button" data-preset="classic">クラシック</button>
+        <button class="chip" type="button" data-preset="european">ヨーロピアン</button>
+        <button class="chip" type="button" data-preset="vegas">ラスベガス式（目安）</button>
+        <button class="chip" type="button" data-preset="asia">アジア・欧州式（目安）</button>
+      </div>
+    </div>
+    <div class="toggles">
+      <div class="tg"><span>ディーラーのソフト17</span><span class="seg" data-rule="h17"><button type="button" data-v="0">スタンド</button><button type="button" data-v="1">ヒット</button></span></div>
+      <div class="tg"><span>ディーラーの2枚目</span><span class="seg" data-rule="peek"><button type="button" data-v="1">最初に確認</button><button type="button" data-v="0">後から引く</button></span></div>
+      <div class="tg"><span>スプリット後のダブル</span><span class="seg" data-rule="das"><button type="button" data-v="1">できる</button><button type="button" data-v="0">できない</button></span></div>
+      <div class="tg"><span>サレンダー</span><span class="seg" data-rule="surrender"><button type="button" data-v="1">できる</button><button type="button" data-v="0">できない</button></span></div>
+      <div class="tg"><span>デッキ数</span><span class="seg" data-rule="decks" data-num="1"><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button><button type="button" data-v="6">6</button><button type="button" data-v="8">8</button></span></div>
+      <div class="tg"><span>ダブルダウン</span><span class="seg" data-rule="dbl911"><button type="button" data-v="0">どの2枚でも</button><button type="button" data-v="1">ハード9〜11のみ</button></span></div>
+      <div class="tg"><span>スプリットしたA</span><span class="seg" data-rule="aceHit"><button type="button" data-v="0">1枚だけ</button><button type="button" data-v="1">何枚でも引ける</button></span></div>
+      <div class="tg"><span>異なる10（JとQなど）のスプリット</span><span class="seg" data-rule="unlike10"><button type="button" data-v="1">できる</button><button type="button" data-v="0">できない</button></span></div>
+      <div class="tg"><span>スプリットの回数</span><span class="seg" data-rule="resplit"><button type="button" data-v="0">1回まで</button><button type="button" data-v="1">3回（4ハンド）まで</button></span></div>
+    </div>
+    <details class="tablerules" id="tableRules">
+      <summary id="tableRulesTitle">このルールの全項目</summary>
+      <ul id="tableRulesList"></ul>
+    </details>
+    <div class="rules-top">
+      <span class="edge">このルールで最適に打ったときのカジノ側の取り分 <b id="edge">—</b></span>
+    </div>
+    <p class="fine">テーブルの表示板（ディーラー横の札）に書いてあるルールに合わせてください。「後から引く」は、ディーラーが最初に1枚だけ表にして、2枚目を全員の後に引く方式（マカオや欧州に多い）。この場合ディーラーがブラックジャックだと、ダブルやスプリットで追加した分も負けになる前提で計算しています。</p>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" id="tab-drill" aria-selected="true" aria-controls="pane-drill">ドリル</button>
+    <button type="button" role="tab" id="tab-play" aria-selected="false" aria-controls="pane-play">実戦</button>
+    <button type="button" role="tab" id="tab-judge" aria-selected="false" aria-controls="pane-judge">判定</button>
+    <button type="button" role="tab" id="tab-chart" aria-selected="false" aria-controls="pane-chart">戦略表</button>
+  </nav>
+
+  <!-- DRILL -->
+  <section id="pane-drill" role="tabpanel" aria-labelledby="tab-drill" style="display:grid;gap:14px">
+    <div class="row">
+      <span style="font-size:13px;color:var(--dim)">出題：</span>
+      <span class="seg" id="drillFilter">
+        <button type="button" data-v="all" aria-pressed="true">すべて</button>
+        <button type="button" data-v="hard">ハード</button>
+        <button type="button" data-v="soft">ソフト（Aあり）</button>
+        <button type="button" data-v="pair">ペア</button>
+        <button type="button" data-v="weak">苦手だけ</button>
+      </span>
+    </div>
+    <div class="felt">
+      <div class="spot"><span class="who">DEALER</span><div class="cards" id="dDealer"></div></div>
+      <div class="spot"><div class="cards" id="dPlayer"></div><span class="tot" id="dTotal"></span><span class="who">YOU</span></div>
+      <div class="actions" id="dActions"></div>
+    </div>
+    <div class="panel" id="dFeedback" hidden>
+      <div class="verdict" id="dVerdict"></div>
+      <div id="dExplain" style="font-size:14px"></div>
+      <table id="dEvTable"><thead><tr><th>選択</th><th>期待値（賭け金1あたり）</th><th>最善との差</th></tr></thead><tbody></tbody></table>
+      <div class="row"><button class="btn main" type="button" id="dNext">次の問題（Enter）</button></div>
+    </div>
+    <div class="panel">
+      <div class="stats">
+        <span>回答 <b id="sN">0</b></span>
+        <span>正解率 <b id="sAcc">—</b></span>
+        <span>ミスによる損（合計） <b id="sLoss">0.00</b></span>
+        <button class="btn" type="button" id="sReset" style="margin-left:auto">記録を消す</button>
+      </div>
+      <div><h2>よく間違える手</h2><ol class="weak" id="weakList"><li style="color:var(--dim)">まだありません</li></ol></div>
+      <p class="fine">キーボード：H ヒット ／ S スタンド ／ D ダブル ／ P スプリット ／ R サレンダー</p>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="pane-play" role="tabpanel" aria-labelledby="tab-play" hidden style="gap:14px">
+    <div class="felt">
+      <div class="spot"><span class="who">DEALER</span><div class="cards" id="pDealer"></div><span class="tot" id="pDealerTot"></span></div>
+      <div class="hands" id="pHands"></div>
+      <div class="toast" id="pToast" aria-live="polite"></div>
+      <div class="why" id="pWhy"></div>
+      <div id="pBetArea" style="display:grid;gap:10px">
+        <div class="bets" id="pBets">
+          <button type="button" data-bet="10">10</button><button type="button" data-bet="25">25</button><button type="button" data-bet="50">50</button><button type="button" data-bet="100">100</button>
+        </div>
+        <button class="act primary" type="button" id="pDeal">配る</button>
+      </div>
+      <div class="actions" id="pActions" hidden></div>
+    </div>
+    <div class="panel">
+      <div class="stats">
+        <span>チップ <b id="pChips">1000</b></span>
+        <span>ハンド数 <b id="pN">0</b></span>
+        <span>戦略どおりの選択 <b id="pAcc">—</b></span>
+        <span>残りの山 <b id="pShoe">—</b></span>
+        <button class="btn" type="button" id="pReset" style="margin-left:auto">1000に戻す</button>
+      </div>
+      <p class="fine">ルール欄のデッキ数で山を配ります（75%で切り直し）。スプリットはルール欄の回数まで、Aのスプリットは1回だけで1枚ずつ。インシュランス（保険）は損なので出していません。選択が戦略と違うと、その場で知らせます。</p>
+    </div>
+  </section>
+
+  <!-- JUDGE -->
+  <section id="pane-judge" role="tabpanel" aria-labelledby="tab-judge" hidden style="gap:14px">
+    <div class="panel">
+      <h2>ディーラーの見えているカード</h2>
+      <div class="pick" id="jUp"></div>
+      <h2>自分のカード（押した順に追加）</h2>
+      <div class="pick" id="jAdd"></div>
+      <div class="row">
+        <button class="btn" type="button" id="jBack">1枚戻す</button>
+        <button class="btn" type="button" id="jClear">クリア</button>
+        <label class="jopt"><input type="checkbox" id="jSplit"> スプリット後の手</label>
+      </div>
+    </div>
+    <div class="felt">
+      <div class="spot"><span class="who">DEALER</span><div class="cards" id="jDealer"></div></div>
+      <div class="spot"><div class="cards" id="jPlayer"></div><span class="tot" id="jTotal"></span><span class="who">YOU</span></div>
+    </div>
+    <div class="panel" id="jResult">
+      <div class="verdict" id="jVerdict">カードを選んでください</div>
+      <div id="jNote" style="font-size:14px"></div>
+      <table id="jTable" hidden><thead><tr><th>選択</th><th>期待値（賭け金1あたり）</th><th>最善との差</th></tr></thead><tbody></tbody></table>
+      <p class="fine">上のルール欄の条件で計算します。3枚目以降の手はヒットかスタンドだけで判定します（ダブル・スプリット・サレンダーは最初の2枚のときだけ）。</p>
+    </div>
+  </section>
+
+  <!-- CHART -->
+  <section id="pane-chart" role="tabpanel" aria-labelledby="tab-chart" hidden style="gap:14px">
+    <div class="legend" id="legend">
+      <span><i class="c-H">H</i>ヒット</span>
+      <span><i class="c-S">S</i>スタンド</span>
+      <span><i class="c-D">D</i>ダブル（できなければヒット）</span>
+      <span><i class="c-D">Ds</i>ダブル（できなければスタンド）</span>
+      <span><i class="c-P">P</i>スプリット</span>
+      <span><i class="c-R">R</i>サレンダー（できなければヒット）</span>
+      <span><i class="c-R">Rs</i>サレンダー（できなければスタンド）</span>
+      <span><i class="c-R">Rp</i>サレンダー（できなければスプリット）</span>
+    </div>
+    <div class="panel"><h2>ハード（Aなし、またはAを1と数える手）</h2><div class="chart-wrap"><table class="chart" id="chHard"></table></div></div>
+    <div class="panel"><h2>ソフト（Aを11と数えられる手）</h2><div class="chart-wrap"><table class="chart" id="chSoft"></table></div></div>
+    <div class="panel"><h2>ペア</h2><div class="chart-wrap"><table class="chart" id="chPair"></table></div></div>
+    <p class="fine">上のルール設定に合わせて表が変わります。デッキ数を反映して計算しています（自分の最初の2枚とディーラーの見えている札を山から除いて計算）。同じ合計でもカードの組み合わせで判断が変わる手は、代表的な組み合わせで表示しています。細かい組み合わせは「判定」タブで確かめられます。</p>
+  </section>
+</div>
+
+<script src="../tools/supabase.js"></script>
+<script src="../tools/tamariba.js"></script>
+<script>
+// Infinite-deck blackjack EV engine. Cards: 1=A, 2..9, 10 (incl. J/Q/K)
+// Blackjack EV engine with a finite shoe.
+// The shoe is reduced by the player's first two cards and the dealer upcard; the dealer's hand is then drawn
+// exactly without replacement from that shoe, and the player's further draws use that shoe's proportions.
+// (Standard "two-card composition dependent" approximation; exact effects of the player's later cards are ignored.)
+// Cards: 1=A, 2..9, 10. rules: { decks, h17, peek, das, surrender, dbl911, aceHit, bjPay }
+function makeEngine(rules) {
+  var ND = rules.decks || 6;
+  function fullDeck() { var d = [0]; for (var c = 1; c <= 10; c++) d.push(c === 10 ? 16 * ND : 4 * ND); return d; }
+  function total(d) { var t = 0; for (var c = 1; c <= 10; c++) t += d[c]; return t; }
+  function val(h, ace) { return ace && h + 10 <= 21 ? h + 10 : h; }
+  function isSoft(h, ace) { return ace && h + 10 <= 21; }
+  function deckAfter(cards) { var d = fullDeck(); cards.forEach(function (c) { d[c] = Math.max(0, d[c] - 1); }); return d; }
+
+  var ctxCache = {};
+  function ctx(up, removed) {
+    var d = deckAfter(removed.concat([up])), k = up + "|" + d.join(",");
+    if (ctxCache[k]) return ctxCache[k];
+    var t = total(d), p = [0];
+    for (var c = 1; c <= 10; c++) p.push(d[c] / t);
+    // dealer: exact draws without replacement from d
+    var memo = {};
+    function from(h, ace, dd) {
+      var mk = h + "|" + ace + "|" + dd.join(",");
+      if (memo[mk]) return memo[mk];
+      var v = val(h, ace), out = { 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0 };
+      if (v > 21) out[22] = 1;
+      else if (v > 17 || (v === 17 && !(rules.h17 && isSoft(h, ace)))) out[v] = 1;
+      else {
+        var tt = total(dd);
+        for (var c = 1; c <= 10; c++) {
+          if (!dd[c]) continue;
+          var q = dd[c] / tt; dd[c]--;
+          var r = from(h + c, ace || c === 1, dd); dd[c]++;
+          for (var x in r) out[x] += q * r[x];
+        }
+      }
+      return (memo[mk] = out);
+    }
+    var bjCard = up === 1 ? 10 : (up === 10 ? 1 : 0), pbj = bjCard ? d[bjCard] / t : 0;
+    var dist = { 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0 };
+    for (var c2 = 1; c2 <= 10; c2++) {
+      if (!d[c2] || c2 === bjCard) continue;
+      var w = (d[c2] / t) / (1 - pbj); d[c2]--;
+      var r = from(up + c2, up === 1 || c2 === 1, d); d[c2]++;
+      for (var x in r) dist[x] += w * r[x];
+    }
+    return (ctxCache[k] = { p: p, dist: dist, pbj: pbj, hit: {} });
+  }
+  function standEV(v, C) {
+    if (v > 21) return -1;
+    var ev = C.dist[22];
+    for (var t = 17; t <= 21; t++) ev += t < v ? C.dist[t] : (t > v ? -C.dist[t] : 0);
+    return ev;
+  }
+  function hitEV(h, ace, C) {
+    var k = h + "|" + ace; if (k in C.hit) return C.hit[k];
+    var ev = 0;
+    for (var c = 1; c <= 10; c++) {
+      var nh = h + c, na = ace || c === 1, v = val(nh, na);
+      ev += C.p[c] * (v > 21 ? -1 : Math.max(standEV(v, C), hitEV(nh, na, C)));
+    }
+    return (C.hit[k] = ev);
+  }
+  function canDouble(h, ace) { return rules.dbl911 ? (!isSoft(h, ace) && h >= 9 && h <= 11) : true; }
+  function doubleEV(h, ace, C) {
+    var ev = 0;
+    for (var c = 1; c <= 10; c++) ev += C.p[c] * standEV(val(h + c, ace || c === 1), C);
+    return 2 * ev;
+  }
+  function splitEV(x, C) {
+    var e = 0;
+    for (var c = 1; c <= 10; c++) {
+      var h = x + c, ace = x === 1 || c === 1, v = val(h, ace), b;
+      if (x === 1 && !rules.aceHit) b = standEV(v, C);
+      else {
+        b = Math.max(standEV(v, C), hitEV(h, ace, C));
+        if (rules.das && canDouble(h, ace)) b = Math.max(b, doubleEV(h, ace, C));
+      }
+      e += C.p[c] * b;
+    }
+    return 2 * e;
+  }
+  function adjust(ev, C, bet) { return rules.peek ? ev : (1 - C.pbj) * ev - C.pbj * bet; }
+  function actions(c1, c2, up, opts) {
+    opts = opts || {};
+    var C = ctx(up, [c1, c2]);
+    var h = c1 + c2, ace = c1 === 1 || c2 === 1, v = val(h, ace), a = {};
+    a.S = adjust(standEV(v, C), C, 1);
+    a.H = adjust(hitEV(h, ace, C), C, 1);
+    if (!opts.noDouble && canDouble(h, ace)) a.D = adjust(doubleEV(h, ace, C), C, 2);
+    if (c1 === c2 && !opts.noSplit) a.P = adjust(splitEV(c1, C), C, 2);
+    if (rules.surrender && !opts.noSurrender) a.R = adjust(-0.5, C, 1);
+    return a;
+  }
+  function hsActions(h, ace, up, cards) {
+    var C = ctx(up, cards || []);
+    return { S: adjust(standEV(val(h, ace), C), C, 1), H: adjust(hitEV(h, ace, C), C, 1) };
+  }
+  function best(a) { var b = null; for (var k in a) if (b === null || a[k] > a[b] + 1e-12) b = k; return b; }
+  function overall() {
+    var full = fullDeck(), T = total(full), tot = 0;
+    for (var up = 1; up <= 10; up++) for (var c1 = 1; c1 <= 10; c1++) for (var c2 = c1; c2 <= 10; c2++) {
+      var d0 = fullDeck(), pu = d0[up] / T; d0[up]--;
+      var t0 = total(d0), p1 = d0[c1] / t0; d0[c1]--;
+      var pp = pu * p1 * (d0[c2] / (t0 - 1)) * (c1 === c2 ? 1 : 2);
+      var C = ctx(up, [c1, c2]), ev;
+      if (c1 === 1 && c2 === 10) ev = (1 - C.pbj) * rules.bjPay;
+      else { var a = actions(c1, c2, up), bv = a[best(a)]; ev = rules.peek ? (1 - C.pbj) * bv - C.pbj : bv; }
+      tot += pp * ev;
+    }
+    return tot;
+  }
+  // Numbers used to explain a decision: chance to bust on one more card, dealer bust chance, chance of a 10-value card.
+  function why(up, cards) {
+    var C = ctx(up, cards), h = 0, ace = false, bust = 0;
+    cards.forEach(function (c) { h += c; if (c === 1) ace = true; });
+    for (var c = 1; c <= 10; c++) if (val(h + c, ace || c === 1) > 21) bust += C.p[c];
+    return { bust: bust, dbust: C.dist[22], ten: C.p[10] };
+  }
+  return { actions: actions, hsActions: hsActions, best: best, overall: overall, val: val, why: why };
+}
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var PRESETS = {
+    table1: { decks: 8, h17: false, peek: true, das: true, surrender: true, dbl911: false, aceHit: false, resplit: true, unlike10: true },
+    classic: { decks: 1, h17: false, peek: false, das: false, surrender: false, dbl911: true, aceHit: true, resplit: false, unlike10: false },
+    european: { decks: 2, h17: false, peek: false, das: false, surrender: false, dbl911: true, aceHit: true, resplit: false, unlike10: false },
+    vegas: { decks: 6, h17: true, peek: true, das: true, surrender: true, dbl911: false, aceHit: false, resplit: false, unlike10: true },
+    asia: { decks: 6, h17: false, peek: false, das: true, surrender: false, dbl911: false, aceHit: false, resplit: false, unlike10: true }
+  };
+  var PRESET_TEXT = {
+    table1: ["アトランティックルール（Atlantic City）", ["アメリカン方式：ディーラーは10相当とAのとき2枚目を最初に確認（ピーク）", "8デック使用", "ディーラーは17で必ずスタンド（ソフト17も）", "どの2枚でもダブルダウン可、スプリット後もダブルダウン可", "スプリットは3回まで（最大4ハンド）。Aのスプリットは1回のみで、Aには追加カード1枚だけ", "スプリットしたAと10点のカードは合計21で、ブラックジャックにはならない", "異なる10相当のカード（JとQなど）もスプリット可", "レイトサレンダー可", "最低ベット100・最高ベット20,000（参考）"]],
+    classic: ["クラシック（Classic）", ["1デック使用", "ディーラーは17で必ずスタンド（ソフト17も）", "ピークなし（ディーラーは2枚目を後から引く）", "ダブルダウンはハード9・10・11のみ", "スプリットは1回のみ（2ハンド）", "スプリットしたAにも何枚でも追加カードを引ける", "スプリットしたAと10点のカードは合計21で、ブラックジャックにはならない", "異なる10点のカードはスプリット不可", "最低ベット100・最高ベット20,000（参考）"]],
+    european: ["ヨーロピアン（European）", ["2デック使用", "ディーラーは17で必ずスタンド（ソフト17も）", "ピークなし（ディーラーは2枚目を後から引く）", "ダブルダウンはハード9・10・11のみ", "スプリットは1回のみ（2ハンド）", "スプリットしたAにも何枚でも追加カードを引ける", "スプリットしたAと10点のカードは合計21で、ブラックジャックにはならない", "異なる10点のカードはスプリット不可"]]
+  };
+  var store = {
+    get: function (k, d) { try { var v = JSON.parse(localStorage.getItem("bjp-" + k)); return v == null ? d : v; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem("bjp-" + k, JSON.stringify(v)); } catch (e) {} }
+  };
+  var RULE_DEFAULT = { decks: 6, h17: false, peek: true, das: true, surrender: false, dbl911: false, aceHit: false, resplit: false, unlike10: true };
+  var rules = Object.assign({}, RULE_DEFAULT, store.get("rules", PRESETS.table1));
+  if ("decks8" in rules) { rules.decks = rules.decks8 ? 8 : 6; delete rules.decks8; }
+  var E;
+  function rebuild() { E = makeEngine(Object.assign({ bjPay: 1.5 }, rules)); }
+
+  var ACT_NAME = { H: "ヒット", S: "スタンド", D: "ダブル", P: "スプリット", R: "サレンダー" };
+  var UPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 1];
+  function rankLabel(c) { return c === 1 ? "A" : String(c); }
+  function upLabel(c) { return c === 1 ? "A" : c === 10 ? "10" : String(c); }
+
+  // ---------- Rules UI ----------
+  function renderRules() {
+    document.querySelectorAll(".seg[data-rule]").forEach(function (seg) {
+      var r = seg.dataset.rule;
+      seg.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(seg.dataset.num ? +b.dataset.v === +rules[r] : +b.dataset.v === (rules[r] ? 1 : 0))); });
+    });
+    document.querySelectorAll("[data-preset]").forEach(function (b) {
+      var p = PRESETS[b.dataset.preset];
+      b.setAttribute("aria-pressed", String(Object.keys(p).every(function (k) { return p[k] === rules[k]; })));
+    });
+    var match = null;
+    Object.keys(PRESETS).forEach(function (k) { var p = PRESETS[k]; if (Object.keys(p).every(function (x) { return p[x] === rules[x]; })) match = k; });
+    var tr = $("tableRules");
+    if (match && PRESET_TEXT[match]) {
+      tr.hidden = false; $("tableRulesTitle").textContent = PRESET_TEXT[match][0] + "の全ルール";
+      $("tableRulesList").innerHTML = PRESET_TEXT[match][1].map(function (x) { return "<li>" + x + "</li>"; }).join("");
+    } else tr.hidden = true;
+    $("edge").textContent = "計算中…";
+    var eng = E;
+    setTimeout(function () { if (eng === E) $("edge").textContent = (-E.overall() * 100).toFixed(2) + "%"; }, 30);
+  }
+  function onRulesChanged() { rebuild(); store.set("rules", rules); renderRules(); renderChart(); if (drill.q && !drill.answered) renderDrillActions(); if (typeof renderJudge === "function") renderJudge(); }
+  document.querySelectorAll(".seg[data-rule]").forEach(function (seg) {
+    seg.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      rules[seg.dataset.rule] = seg.dataset.num ? +b.dataset.v : b.dataset.v === "1"; onRulesChanged();
+    });
+  });
+  document.querySelectorAll("[data-preset]").forEach(function (b) {
+    b.addEventListener("click", function () { rules = Object.assign({}, RULE_DEFAULT, PRESETS[b.dataset.preset]); onRulesChanged(); });
+  });
+
+  // ---------- Tabs ----------
+  var tabs = ["drill", "play", "judge", "chart"];
+  function showTab(name) {
+    tabs.forEach(function (t) {
+      $("tab-" + t).setAttribute("aria-selected", String(t === name));
+      var p = $("pane-" + t); p.hidden = t !== name; if (t === name) p.style.display = "grid";
+    });
+    store.set("tab", name);
+  }
+  tabs.forEach(function (t) { $("tab-" + t).addEventListener("click", function () { showTab(t); }); });
+
+  // ---------- Cards ----------
+  var SUITS = [["♠", false], ["♥", true], ["♦", true], ["♣", false]];
+  function cardEl(c, face, suitIdx) {
+    var d = document.createElement("div");
+    if (!face) { d.className = "card back"; d.setAttribute("aria-label", "伏せたカード"); return d; }
+    var s = SUITS[suitIdx == null ? Math.floor(Math.random() * 4) : suitIdx];
+    var label = c.label || rankLabel(c.v);
+    d.className = "card" + (s[1] ? " red" : "");
+    d.setAttribute("aria-label", label + s[0]);
+    d.innerHTML = '<span class="r">' + label + '</span><span class="s">' + s[0] + '</span><span class="c">' + s[0] + "</span>";
+    return d;
+  }
+  function tenLabel() { return ["10", "J", "Q", "K"][Math.floor(Math.random() * 4)]; }
+  function mkCard(v) { return { v: v, label: v === 10 ? tenLabel() : rankLabel(v), suit: Math.floor(Math.random() * 4) }; }
+  function handInfo(cards) {
+    var h = 0, ace = false; cards.forEach(function (c) { h += c.v; if (c.v === 1) ace = true; });
+    var soft = ace && h + 10 <= 21; return { h: h, ace: ace, v: soft ? h + 10 : h, soft: soft };
+  }
+  function totalText(cards) { var i = handInfo(cards); return i.soft && i.v < 21 ? (i.h + "／" + i.v) : String(i.v); }
+
+  // EV-based action code for chart / explanation
+  function code(a) {
+    var b = E.best(a);
+    function fb(excl) { var f = {}; for (var k in a) if (excl.indexOf(k) < 0) f[k] = a[k]; return E.best(f); }
+    if (b === "D") return fb(["D", "R", "P"]) === "H" ? "D" : "Ds";
+    if (b === "R") { var f = fb(["R"]); if (f === "P") return "Rp"; var g = fb(["R", "D", "P"]); return g === "S" ? "Rs" : "R"; }
+    return b;
+  }
+  // Plain-language reason for the best play. vs = card values in hand, up = dealer upcard value.
+  function reason(b, vs, up) {
+    var info = handInfo(vs.map(function (v) { return { v: v }; })), w = E.why(up, vs);
+    var pct = function (x) { return "約" + Math.round(x * 100) + "%"; };
+    var tot = (info.soft ? "ソフト" : "合計") + info.v;
+    var dealer = "ディーラーの見えているカードは" + upLabel(up) + "で、ディーラーがバーストする確率は" + pct(w.dbust) + "。";
+    var pair = vs.length === 2 && vs[0] === vs[1];
+    var pre = pair && b !== "P" ? "このペアは分けないほうがよい。" : "";
+    if (b === "S") {
+      if (info.soft || w.bust === 0 || info.v >= 19) return pre + tot + "はこのままで十分戦える。" + dealer + "引いて形を崩すより、このまま待つほうが得。";
+      return pre + tot + "でもう1枚引くと、バーストする確率が" + pct(w.bust) + "。" + dealer +
+        (w.dbust >= 0.33 ? "ディーラーが崩れやすい場面なので、自分は危険を冒さずに待つほうが得。" : "ディーラーは強いが、引いて自分がバーストする損のほうが大きい。");
+    }
+    if (b === "H") {
+      if (w.bust === 0) return pre + tot + "は、どのカードを引いてもバーストしない。" + dealer + "引いて合計を上げるのが得。";
+      return pre + tot + "のままだと、ディーラーが17以上で止まったときに負ける。" + dealer + "引くとバーストする確率は" + pct(w.bust) + "あるが、それでも引くほうが損が小さい。";
+    }
+    if (b === "D") return pre + tot + "は次の1枚で強い手になりやすい（10点のカードが出る確率" + pct(w.ten) + "）。" + dealer + "有利な場面なので、賭けを倍にして1枚だけ引くのが得。";
+    if (b === "P") {
+      if (vs[0] === 1) return "A・Aは合計12（または2）で弱い。分ければAから始まる2つの手になり、10点のカードが来れば21になる。";
+      if (vs[0] === 8) return "8・8は合計16で、いちばん負けやすい手。分ければ8から始まる2つの手になり、16のまま戦うよりずっと良い。";
+      return tot + "の1つの手より、" + rankLabel(vs[0]) + "から始まる2つの手にしたほうが得。" + dealer;
+    }
+    if (b === "R") return tot + "で" + upLabel(up) + "が相手だと、どう打っても負ける見込みが大きい。賭け金の半分を返してもらうほうが損が小さい。";
+    return "";
+  }
+  function handKey(c1, c2, up) {
+    var i = handInfo([{ v: c1 }, { v: c2 }]);
+    var name = c1 === c2 ? (rankLabel(c1) + "・" + rankLabel(c2)) : (i.soft ? "ソフト" + i.v + "（A・" + rankLabel(c1 === 1 ? c2 : c1) + "）" : "ハード" + i.v);
+    return name + " 対 " + upLabel(up);
+  }
+
+  // ---------- DRILL ----------
+  var drill = { q: null, answered: false, filter: "all" };
+  var dstats = store.get("dstats", { n: 0, ok: 0, loss: 0, miss: {} });
+  function randV() { var r = Math.floor(Math.random() * 13) + 1; return r > 10 ? 10 : r; }
+  function genQ() {
+    var f = drill.filter, keys = Object.keys(dstats.miss);
+    if (f === "weak" && keys.length) {
+      var arr = []; keys.forEach(function (k) { for (var i = 0; i < dstats.miss[k].n; i++) arr.push(dstats.miss[k].q); });
+      var q = arr[Math.floor(Math.random() * arr.length)];
+      return { c1: q[0], c2: q[1], up: q[2] };
+    }
+    for (var t = 0; t < 500; t++) {
+      var c1 = randV(), c2 = randV(), up = randV();
+      if ((c1 === 1 && c2 === 10) || (c1 === 10 && c2 === 1)) continue;
+      var info = handInfo([{ v: c1 }, { v: c2 }]);
+      var isPair = c1 === c2, isSoft = info.ace && !isPair;
+      if (f === "pair" && !isPair) continue;
+      if (f === "soft" && !isSoft) continue;
+      if (f === "hard" && (isPair || info.ace)) continue;
+      // skip trivial hands (hard 18+ / hard 4-8 non-pairs) most of the time
+      if ((f === "all" || f === "hard") && !isPair && !info.ace && (info.v >= 18 || info.v <= 8) && Math.random() < 0.85) continue;
+      return { c1: c1, c2: c2, up: up };
+    }
+    return { c1: 10, c2: 6, up: 10 };
+  }
+  function drillOpts(q) { return { noSplit: q.c1 !== q.c2, noSurrender: !rules.surrender }; }
+  function newDrill() {
+    drill.q = genQ(); drill.answered = false;
+    var q = drill.q;
+    q.cards = [mkCard(q.c1), mkCard(q.c2)]; q.upCard = mkCard(q.up);
+    var dd = $("dDealer"); dd.innerHTML = "";
+    dd.appendChild(cardEl(q.upCard, true, q.upCard.suit));
+    if (rules.peek) dd.appendChild(cardEl(null, false));
+    var dp = $("dPlayer"); dp.innerHTML = "";
+    q.cards.forEach(function (c) { dp.appendChild(cardEl(c, true, c.suit)); });
+    $("dTotal").textContent = "合計 " + totalText(q.cards);
+    $("dFeedback").hidden = true;
+    renderDrillActions();
+  }
+  function renderDrillActions() {
+    var q = drill.q, a = E.actions(q.c1, q.c2, q.up, drillOpts(q));
+    var html = "";
+    ["H", "S", "D", "P", "R"].forEach(function (k) {
+      if (!(k in a)) return;
+      html += '<button class="act" type="button" data-act="' + k + '">' + ACT_NAME[k] + "<small>" + k + "</small></button>";
+    });
+    $("dActions").innerHTML = html;
+  }
+  function answerDrill(k) {
+    if (!drill.q || drill.answered) return;
+    var q = drill.q, a = E.actions(q.c1, q.c2, q.up, drillOpts(q));
+    if (!(k in a)) return;
+    drill.answered = true;
+    var b = E.best(a), diff = a[b] - a[k], ok = diff < 1e-9;
+    var key = handKey(q.c1, q.c2, q.up);
+    dstats.n++; if (ok) dstats.ok++; else {
+      dstats.loss += diff;
+      var m = dstats.miss[key] || { n: 0, q: [q.c1, q.c2, q.up], best: b };
+      m.n++; m.best = b; dstats.miss[key] = m;
+    }
+    if (ok && dstats.miss[key]) { dstats.miss[key].n--; if (dstats.miss[key].n <= 0) delete dstats.miss[key]; }
+    store.set("dstats", dstats);
+
+    document.querySelectorAll("#dActions .act").forEach(function (btn) {
+      btn.disabled = true; if (btn.dataset.act === b) { btn.disabled = false; btn.classList.add("primary"); btn.tabIndex = -1; }
+    });
+    var v = $("dVerdict");
+    v.className = "verdict " + (ok ? "ok" : "ng");
+    var close = !ok && diff < 0.005;
+    v.textContent = ok ? "正解：" + ACT_NAME[b] : "正解は " + ACT_NAME[b] + (close ? "（ほぼ互角）" : "");
+    $("dExplain").textContent = key + "。" + (ok ? "" : ACT_NAME[k] + "ではなく" + ACT_NAME[b] + "にするべきでした。") + "理由：" + reason(b, [q.c1, q.c2], q.up) + (ok ? "" : "あなたの選択（" + ACT_NAME[k] + "）は、賭け金100あたり約" + (diff * 100).toFixed(1) + "の損。") +
+      (close ? "差はごくわずかなので、実戦では気にしすぎなくて大丈夫。" : "");
+    var tb = $("dEvTable").querySelector("tbody"); tb.innerHTML = "";
+    Object.keys(a).sort(function (x, y) { return a[y] - a[x]; }).forEach(function (x) {
+      var tr = document.createElement("tr");
+      if (x === b) tr.className = "best"; if (x === k && !ok) tr.className += " mine";
+      tr.innerHTML = "<td>" + ACT_NAME[x] + '</td><td class="num">' + (a[x] >= 0 ? "+" : "") + a[x].toFixed(3) + '</td><td class="num">' + (x === b ? "—" : "−" + (a[b] - a[x]).toFixed(3)) + "</td>";
+      tb.appendChild(tr);
+    });
+    $("dFeedback").hidden = false;
+    renderDrillStats();
+    $("dNext").focus({ preventScroll: true });
+  }
+  function renderDrillStats() {
+    $("sN").textContent = dstats.n;
+    $("sAcc").textContent = dstats.n ? (dstats.ok / dstats.n * 100).toFixed(1) + "%" : "—";
+    $("sLoss").textContent = dstats.loss.toFixed(2);
+    var keys = Object.keys(dstats.miss).sort(function (x, y) { return dstats.miss[y].n - dstats.miss[x].n; }).slice(0, 8);
+    $("weakList").innerHTML = keys.length ? keys.map(function (k) {
+      return "<li>" + k + "：正解は" + ACT_NAME[dstats.miss[k].best] + "（" + dstats.miss[k].n + "回）</li>";
+    }).join("") : '<li style="color:var(--dim)">まだありません</li>';
+  }
+  $("dActions").addEventListener("click", function (e) { var b = e.target.closest("[data-act]"); if (b) answerDrill(b.dataset.act); });
+  $("dNext").addEventListener("click", newDrill);
+  $("drillFilter").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.v === "weak" && !Object.keys(dstats.miss).length) { $("dTotal").textContent = "苦手な手はまだありません"; return; }
+    drill.filter = b.dataset.v;
+    this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    newDrill();
+  });
+  var resetArmed = false;
+  $("sReset").addEventListener("click", function () {
+    var btn = this;
+    if (!resetArmed) { resetArmed = true; btn.textContent = "もう一度押すと消えます"; setTimeout(function () { resetArmed = false; btn.textContent = "記録を消す"; }, 3000); return; }
+    resetArmed = false; btn.textContent = "記録を消す";
+    dstats = { n: 0, ok: 0, loss: 0, miss: {} }; store.set("dstats", dstats); renderDrillStats();
+  });
+
+  // ---------- PLAY ----------
+  var play = { chips: store.get("chips", 1000), bet: store.get("bet", 25), shoe: [], cut: 0, n: 0, dec: 0, decOk: 0, phase: "bet", dealer: [], hands: [], cur: 0 };
+  function newShoe() {
+    var s = [];
+    var nd = rules.decks || 6; play.shoeDecks = nd;
+    for (var d = 0; d < nd; d++) for (var su = 0; su < 4; su++) for (var r = 1; r <= 13; r++) s.push({ v: r > 10 ? 10 : r, label: r === 1 ? "A" : r === 11 ? "J" : r === 12 ? "Q" : r === 13 ? "K" : String(r), suit: su });
+    for (var i = s.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = s[i]; s[i] = s[j]; s[j] = t; }
+    play.shoe = s; play.cut = Math.floor(s.length * 0.25);
+  }
+  function draw() { return play.shoe.pop(); }
+  function isBJ(cards) { return cards.length === 2 && handInfo(cards).v === 21; }
+
+  function renderPlay() {
+    var dd = $("pDealer"); dd.innerHTML = "";
+    play.dealer.forEach(function (c, i) { dd.appendChild(cardEl(c, !(i === 1 && c.hidden), c.suit)); });
+    var shown = play.dealer.filter(function (c) { return !c.hidden; });
+    $("pDealerTot").textContent = shown.length ? "合計 " + (play.phase === "done" || play.phase === "dealer" ? String(handInfo(shown).v) : totalText(shown)) : "";
+    var wrap = $("pHands"); wrap.innerHTML = "";
+    play.hands.forEach(function (h, i) {
+      var d = document.createElement("div"); d.className = "hand" + (play.phase === "player" && i === play.cur ? " active" : "");
+      var cs = document.createElement("div"); cs.className = "cards";
+      h.cards.forEach(function (c) { cs.appendChild(cardEl(c, true, c.suit)); });
+      d.appendChild(cs);
+      var t = document.createElement("span"); t.className = "tot"; t.textContent = "合計 " + totalText(h.cards) + "　賭け " + h.bet; d.appendChild(t);
+      var r = document.createElement("span"); r.className = "res"; r.textContent = h.result || ""; d.appendChild(r);
+      wrap.appendChild(d);
+    });
+    $("pChips").textContent = play.chips;
+    $("pN").textContent = play.n;
+    $("pAcc").textContent = play.dec ? (play.decOk / play.dec * 100).toFixed(1) + "%（" + play.decOk + "/" + play.dec + "）" : "—";
+    $("pShoe").textContent = play.shoe.length ? play.shoe.length + "枚" : "—";
+    $("pBetArea").hidden = play.phase !== "bet" && play.phase !== "done";
+    $("pActions").hidden = play.phase !== "player";
+    document.querySelectorAll("#pBets button").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.bet === play.bet)); });
+    $("pDeal").disabled = play.chips < play.bet;
+    $("pDeal").textContent = play.chips < play.bet ? "チップが足りません" : (play.phase === "done" ? "次のハンドを配る" : "配る");
+    if (play.phase === "player") renderPlayActions();
+  }
+  // split allowed by the table rules (chip count checked separately)
+  function canSplit(h) {
+    if (h.cards.length !== 2 || h.cards[0].v !== h.cards[1].v) return false;
+    if (h.cards[0].v === 10 && !rules.unlike10 && h.cards[0].label !== h.cards[1].label) return false;
+    if (h.split && h.cards[0].v === 1) return false;            // aces split once only
+    return rules.resplit ? play.hands.length < 4 : play.hands.length === 1;
+  }
+  function avail(h) {
+    var first = h.cards.length === 2, a = { H: true, S: true };
+    var hi = handInfo(h.cards);
+    if (first && play.chips >= h.bet && (!h.split || rules.das) && (!rules.dbl911 || (!hi.soft && hi.h >= 9 && hi.h <= 11)) && !(h.split && h.cards[0].v === 1 && !rules.aceHit)) a.D = true;
+    if (canSplit(h) && play.chips >= h.bet) a.P = true;
+    if (first && !h.split && play.hands.length === 1 && rules.surrender) a.R = true;
+    return a;
+  }
+  function strategyEVs(h) {
+    var up = play.dealer[0].v;
+    if (h.cards.length === 2) {
+      var av = avail(h);
+      // split/double availability for the EV table follows the table rules, not the chip count
+      var a = E.actions(h.cards[0].v, h.cards[1].v, up, {
+        noSplit: !canSplit(h),
+        noDouble: h.split && !rules.das,
+        noSurrender: !(rules.surrender && !h.split && play.hands.length === 1)
+      });
+      return a;
+    }
+    var i = handInfo(h.cards); return E.hsActions(i.h, i.ace, up, h.cards.map(function (c) { return c.v; }));
+  }
+  function renderPlayActions() {
+    var h = play.hands[play.cur], a = avail(h), html = "";
+    ["H", "S", "D", "P", "R"].forEach(function (k) {
+      if (!a[k]) return;
+      html += '<button class="act" type="button" data-pact="' + k + '">' + ACT_NAME[k] + "<small>" + k + "</small></button>";
+    });
+    $("pActions").innerHTML = html;
+  }
+  function toast(msg, cls) { var t = $("pToast"); t.className = "toast " + (cls || ""); t.textContent = msg; }
+
+  function deal() {
+    if (play.chips < play.bet) return;
+    if (play.shoe.length < play.cut || !play.shoe.length || play.shoeDecks !== (rules.decks || 6)) { newShoe(); toast("山を切り直しました（" + play.shoeDecks + "デック）"); } else toast("");
+    play.chips -= play.bet; play.n++; $("pWhy").textContent = "";
+    play.hands = [{ cards: [draw()], bet: play.bet, done: false }];
+    play.dealer = [draw()];
+    play.hands[0].cards.push(draw());
+    if (rules.peek) { var hole = draw(); hole.hidden = true; play.dealer.push(hole); }
+    play.cur = 0; play.phase = "player";
+    var pbj = isBJ(play.hands[0].cards);
+    if (rules.peek) {
+      var dealerBJ = handInfo([play.dealer[0], play.dealer[1]]).v === 21;
+      if (dealerBJ) { play.phase = "dealer"; renderPlay(); setTimeout(finishRound, DEALER_MS); return; }
+      if (pbj) { finishRound(); return; }
+    } else if (pbj) { play.phase = "dealer"; dealerPlay(); return; }
+    renderPlay();
+  }
+  function act(k) {
+    if (play.phase !== "player") return;
+    var h = play.hands[play.cur], a = avail(h); if (!a[k]) return;
+    // check against basic strategy
+    var ev = strategyEVs(h);
+    Object.keys(ev).forEach(function (x) { if (!a[x]) delete ev[x]; }); // judge only among actions actually offered
+    var b = E.best(ev);
+    play.dec++;
+    if (k === b || (ev[b] - ev[k]) < 1e-9) { play.decOk++; toast("戦略どおり：" + ACT_NAME[k], "ok"); }
+    else toast("戦略では " + ACT_NAME[b] + "（" + ACT_NAME[k] + "だと賭け金100あたり約" + ((ev[b] - ev[k]) * 100).toFixed(1) + "の損）", "ng");
+    $("pWhy").textContent = (k === b || (ev[b] - ev[k]) < 1e-9 ? "" : ACT_NAME[k] + "ではなく" + ACT_NAME[b] + "にするべきでした。") + "理由：" + reason(b, h.cards.map(function (c) { return c.v; }), play.dealer[0].v);
+
+    if (k === "H") { h.cards.push(draw()); if (handInfo(h.cards).v >= 21) h.done = true; }
+    else if (k === "S") h.done = true;
+    else if (k === "D") { play.chips -= h.bet; h.bet *= 2; h.cards.push(draw()); h.done = true; }
+    else if (k === "R") { h.surrender = true; h.done = true; }
+    else if (k === "P") {
+      play.chips -= h.bet;
+      var c2 = h.cards.pop();
+      var h2 = { cards: [c2, draw()], bet: h.bet, split: true };
+      h.cards.push(draw()); h.split = true;
+      play.hands.splice(play.cur + 1, 0, h2);
+      if (h.cards[0].v === 1 && !rules.aceHit) { h.done = true; h2.done = true; }
+    }
+    advance();
+  }
+  function advance() {
+    while (play.cur < play.hands.length && play.hands[play.cur].done) play.cur++;
+    if (play.cur < play.hands.length) {
+      var h = play.hands[play.cur];
+      if (handInfo(h.cards).v >= 21) { h.done = true; advance(); return; }
+      renderPlay(); return;
+    }
+    play.phase = "dealer"; dealerPlay();
+  }
+  // Dealer turns cards one at a time, like a real table.
+  var DEALER_MS = 900;
+  function dealerPlay() {
+    play.phase = "dealer";
+    var live = play.hands.some(function (h) { return !h.surrender && handInfo(h.cards).v <= 21; }) && !(play.hands.length === 1 && isBJ(play.hands[0].cards) && !play.hands[0].split);
+    renderPlay();
+    function step() {
+      var i = handInfo(play.dealer);
+      if (live && !isBJ(play.dealer) && !(i.v > 17 || (i.v === 17 && !(rules.h17 && i.soft)))) {
+        play.dealer.push(draw()); renderPlay(); setTimeout(step, DEALER_MS); return;
+      }
+      setTimeout(finishRound, 400);
+    }
+    setTimeout(function () {
+      if (play.dealer[1]) play.dealer[1].hidden = false; else play.dealer.push(draw());
+      renderPlay(); setTimeout(step, DEALER_MS);
+    }, 500);
+  }
+  function finishRound() {
+    play.dealer.forEach(function (c) { c.hidden = false; });
+    var d = handInfo(play.dealer), dBJ = isBJ(play.dealer), net = 0;
+    play.hands.forEach(function (h) {
+      var p = handInfo(h.cards), pBJ = isBJ(h.cards) && !h.split && play.hands.length === 1;
+      var pay = 0;
+      if (h.surrender) { pay = h.bet / 2; h.result = "サレンダー（半分戻り）"; }
+      else if (pBJ && dBJ) { pay = h.bet; h.result = "引き分け"; }
+      else if (pBJ) { pay = h.bet * 2.5; h.result = "ブラックジャック！"; }
+      else if (dBJ) { pay = 0; h.result = "負け（ディーラーBJ）"; }
+      else if (p.v > 21) { pay = 0; h.result = "バースト"; }
+      else if (d.v > 21 || p.v > d.v) { pay = h.bet * 2; h.result = "勝ち"; }
+      else if (p.v === d.v) { pay = h.bet; h.result = "引き分け"; }
+      else { pay = 0; h.result = "負け"; }
+      play.chips += pay; net += pay - h.bet;
+    });
+    play.phase = "done";
+    store.set("chips", play.chips);
+    if (window.TAMARIBA) TAMARIBA.wallet.sync();
+    var t = $("pToast").textContent;
+    renderPlay();
+    toast((t ? t + "　／　" : "") + "このハンド " + (net >= 0 ? "+" : "") + net, $("pToast").className.indexOf("ng") >= 0 ? "ng" : "");
+  }
+  $("pBets").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-bet]"); if (!b) return; play.bet = +b.dataset.bet; store.set("bet", play.bet); renderPlay();
+  });
+  $("pDeal").addEventListener("click", deal);
+  $("pActions").addEventListener("click", function (e) { var b = e.target.closest("[data-pact]"); if (b) act(b.dataset.pact); });
+  var pResetArmed = false;
+  $("pReset").addEventListener("click", function () {
+    var btn = this;
+    if (play.phase === "player" || play.phase === "dealer") return;
+    if (!pResetArmed) { pResetArmed = true; btn.textContent = "もう一度押すと戻します"; setTimeout(function () { pResetArmed = false; btn.textContent = "1000に戻す"; }, 3000); return; }
+    pResetArmed = false; btn.textContent = "1000に戻す";
+    play.chips = 1000; play.n = 0; play.dec = 0; play.decOk = 0; play.hands = []; play.dealer = []; play.phase = "bet";
+    store.set("chips", 1000); toast(""); renderPlay();
+  });
+
+  // ---------- CHART ----------
+  function cell(c) {
+    var cls = c[0] === "D" ? "D" : c[0] === "R" ? "R" : c;
+    return '<td class="c-' + cls + '">' + c + "</td>";
+  }
+  function head() { return "<thead><tr><th></th>" + UPS.map(function (u) { return "<th>" + upLabel(u) + "</th>"; }).join("") + "</tr></thead>"; }
+  function renderChart() {
+    var hardRows = [["5〜8", 2, 6], ["9", 2, 7], ["10", 2, 8], ["11", 2, 9], ["12", 10, 2], ["13", 10, 3], ["14", 10, 4], ["15", 10, 5], ["16", 10, 6], ["17以上", 10, 7]];
+    var noP = { noSplit: true };
+    $("chHard").innerHTML = head() + "<tbody>" + hardRows.map(function (r) {
+      return '<tr><th class="rowh">' + r[0] + "</th>" + UPS.map(function (u) { return cell(code(E.actions(r[1], r[2], u, noP))); }).join("") + "</tr>";
+    }).join("") + "</tbody>";
+    var soft = [];
+    for (var x = 2; x <= 9; x++) soft.push(x);
+    $("chSoft").innerHTML = head() + "<tbody>" + soft.map(function (x) {
+      return '<tr><th class="rowh">A・' + x + "（" + (11 + x) + "）</th>" + UPS.map(function (u) { return cell(code(E.actions(1, x, u, noP))); }).join("") + "</tr>";
+    }).join("") + "</tbody>";
+    var pairs = [1, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+    $("chPair").innerHTML = head() + "<tbody>" + pairs.map(function (x) {
+      var l = rankLabel(x);
+      return '<tr><th class="rowh">' + l + "・" + l + "</th>" + UPS.map(function (u) { return cell(code(E.actions(x, x, u))); }).join("") + "</tr>";
+    }).join("") + "</tbody>";
+  }
+
+
+  // ---------- JUDGE: pick cards, show the best play ----------
+  var J = { up: null, cards: [] };
+  var PICK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  function pickLabel(v) { return v === 1 ? "A" : v === 10 ? "10" : String(v); }
+  $("jUp").innerHTML = UPS.map(function (v) { return '<button type="button" data-up="' + v + '" aria-pressed="false">' + pickLabel(v) + "</button>"; }).join("");
+  $("jAdd").innerHTML = PICK.map(function (v) { return '<button type="button" data-add="' + v + '">' + pickLabel(v) + "</button>"; }).join("");
+  $("jUp").addEventListener("click", function (e) { var b = e.target.closest("[data-up]"); if (!b) return; J.up = +b.dataset.up; renderJudge(); });
+  $("jAdd").addEventListener("click", function (e) { var b = e.target.closest("[data-add]"); if (!b || J.cards.length >= 11) return; J.cards.push({ v: +b.dataset.add, label: pickLabel(+b.dataset.add), suit: J.cards.length % 4 }); renderJudge(); });
+  $("jBack").addEventListener("click", function () { J.cards.pop(); renderJudge(); });
+  $("jClear").addEventListener("click", function () { J.cards = []; J.up = null; renderJudge(); });
+  $("jSplit").addEventListener("change", renderJudge);
+  function renderJudge() {
+    document.querySelectorAll("#jUp [data-up]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.up === J.up)); });
+    var dd = $("jDealer"); dd.innerHTML = "";
+    if (J.up) { dd.appendChild(cardEl({ v: J.up, label: pickLabel(J.up) }, true, 1)); if (rules.peek) dd.appendChild(cardEl(null, false)); }
+    var dp = $("jPlayer"); dp.innerHTML = "";
+    J.cards.forEach(function (c) { dp.appendChild(cardEl(c, true, c.suit)); });
+    $("jTotal").textContent = J.cards.length ? "合計 " + totalText(J.cards) : "";
+    var v = $("jVerdict"), note = $("jNote"), tbl = $("jTable"), tb = tbl.querySelector("tbody");
+    v.className = "verdict"; note.textContent = ""; tbl.hidden = true; tb.innerHTML = "";
+    if (!J.up || J.cards.length < 2) { v.textContent = !J.up ? "ディーラーのカードを選んでください" : "自分のカードを2枚以上選んでください"; return; }
+    var info = handInfo(J.cards), split = $("jSplit").checked;
+    if (info.v > 21) { v.textContent = "バースト（" + info.v + "）"; return; }
+    if (split && J.cards[0].v === 1 && !rules.aceHit) { v.className = "verdict big"; v.textContent = "選択なし"; note.textContent = "スプリットしたAには1枚だけ配られて終わりです（このルールではAの再スプリットもできません）。"; return; }
+    if (J.cards.length === 2 && info.v === 21 && !split) { v.className = "verdict big ok"; v.textContent = "ブラックジャック！"; note.textContent = "選ぶことはありません（インシュランス・イーブンマネーは受けないのが基本）。"; return; }
+    if (info.v === 21) { v.className = "verdict big ok"; v.textContent = "21：スタンド"; return; }
+    var a;
+    if (J.cards.length === 2) {
+      var c1 = J.cards[0].v, c2 = J.cards[1].v, pair = c1 === c2;
+      var splitOk = pair && !(split && c1 === 1) && (!split || rules.resplit);
+      if (split && c1 === 1 && J.cards.length === 2 && rules.aceHit) splitOk = false;
+      a = E.actions(c1, c2, J.up, { noSplit: !splitOk, noDouble: split && !rules.das, noSurrender: split || !rules.surrender });
+    } else a = E.hsActions(info.h, info.ace, J.up, J.cards.map(function (c) { return c.v; }));
+    var b = E.best(a);
+    v.className = "verdict big ok"; v.textContent = "おすすめ：" + ACT_NAME[b];
+    var fb = null;
+    if (b === "D" || b === "R" || b === "P") {
+      var f = {}; for (var k in a) if (k !== b && (b === "P" || k !== "P")) f[k] = a[k];
+      if (b === "D") { delete f.R; }
+      fb = E.best(f);
+    }
+    var notes = [];
+    if (fb && b !== "P") notes.push((b === "D" ? "ダブルできない場合は" : "サレンダーできない場合は") + ACT_NAME[fb] + "。");
+    if (J.up === 1 || J.up === 10) notes.push(rules.peek ? "ディーラーがブラックジャックでないと確認済みの前提で計算しています。" : "ディーラーがあとでブラックジャックになる可能性も含めて計算しています。");
+    if (J.up === 1 && J.cards.length === 2) notes.push("インシュランスは受けないのが基本です。");
+    note.textContent = notes.join(" ");
+    Object.keys(a).sort(function (x, y) { return a[y] - a[x]; }).forEach(function (x) {
+      var tr = document.createElement("tr"); if (x === b) tr.className = "best";
+      tr.innerHTML = "<td>" + ACT_NAME[x] + '</td><td class="num">' + (a[x] >= 0 ? "+" : "") + a[x].toFixed(3) + '</td><td class="num">' + (x === b ? "—" : "−" + (a[b] - a[x]).toFixed(3)) + "</td>";
+      tb.appendChild(tr);
+    });
+    tbl.hidden = false;
+  }
+  // ---------- Keyboard ----------
+  document.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "INPUT" || e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key.toUpperCase();
+    var onDrill = !$("pane-drill").hidden, onPlay = !$("pane-play").hidden;
+    if (onDrill) {
+      if (e.key === "Enter" && drill.answered) { e.preventDefault(); newDrill(); return; }
+      if ("HSDPR".indexOf(k) >= 0 && k.length === 1) answerDrill(k);
+    } else if (onPlay) {
+      if ("HSDPR".indexOf(k) >= 0 && k.length === 1) act(k);
+      else if (e.key === "Enter" && (play.phase === "bet" || play.phase === "done") && e.target.tagName !== "BUTTON") deal();
+    }
+  });
+
+  // ---------- Boot ----------
+  rebuild(); renderRules(); renderChart(); renderDrillStats(); newDrill(); renderPlay();
+  if (window.TAMARIBA) TAMARIBA.wallet.attach({ game: "blackjack", get: function () { return play.chips; },
+    set: function (v) { play.chips = v; store.set("chips", v); $("pReset").hidden = true; renderPlay(); },
+    busy: function () { return play.phase !== "bet" && play.phase !== "done"; } });
+  showTab(store.get("tab", "drill"));
+})();
+</script>
+
+</body></html>

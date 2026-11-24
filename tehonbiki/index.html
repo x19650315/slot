@@ -1,0 +1,320 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>手本引き</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Shippori+Mincho+B1:wght@500;700;800&display=swap">
+<style>
+/* 賭場の盆：濃い木の間に白い盆茣蓙。数字は筆文字、配当は朱。単一の見た目（暗い室内）で作る */
+:root { color-scheme: dark;
+  --wood: #1e140d; --wood2: #2b1d13; --cloth: #f3efe4; --cloth2: #e4dccb; --ink: #1b1611; --paper: #efe6d2;
+  --text: #efe6d2; --dim: #b3a58c; --shu: #b8261b; --gold: #d8a948; --win: #6fbf73;
+  --f-brush: "Yuji Syuku", "Shippori Mincho B1", serif; --f-body: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif; }
+[hidden] { display: none !important; }
+body { margin: 0; background: radial-gradient(ellipse at 50% 0%, var(--wood2), var(--wood) 70%) fixed; color: var(--text); font: 15px/1.6 var(--f-body); }
+.wrap { max-width: 640px; margin: 0 auto; padding-block: 12px 48px; padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); display: grid; gap: 12px; }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+h1 { margin: 0; font-family: var(--f-brush); font-weight: 400; font-size: 34px; letter-spacing: .12em; }
+h1 small { font-family: var(--f-body); font-size: 11px; color: var(--dim); letter-spacing: 0; margin-left: 6px; }
+.credit { font-variant-numeric: tabular-nums; } .credit b { color: var(--gold); font-size: 20px; }
+.bon { background: linear-gradient(180deg, var(--cloth), var(--cloth2)); color: var(--ink); border-radius: 6px; padding: 14px 12px 12px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.45); display: grid; gap: 12px; }
+.dou { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+.kamishita { width: 76px; height: 104px; border-radius: 4px; position: relative; display: grid; place-items: center; }
+.kamishita .cloth { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, #2c3d63 0 6px, #24345a 6px 12px); border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,.35); transition: transform .5s ease, opacity .5s; transform-origin: top; }
+.kamishita.open .cloth { transform: rotateX(80deg) translateY(-30px); opacity: 0; }
+.kuri { width: 70px; height: 98px; border-radius: 4px; background: var(--paper); border: 2px solid var(--ink); display: grid; place-items: center; font-family: var(--f-brush); font-size: 44px; color: var(--ink); }
+.dou .who { font-size: 13px; color: #5a4a36; } .dou .who b { color: var(--ink); font-size: 15px; }
+.msg { font-size: 15px; font-weight: 700; min-height: 1.5em; }
+.msg.win { color: #1d6b2a; } .msg.lose { color: var(--shu); }
+.moku { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.peg { border: 0; background: linear-gradient(180deg, #8a5a32, #5e3a1d); color: var(--paper); border-radius: 4px; padding: 6px 0 4px; font-family: var(--f-brush); font-size: 24px; line-height: 1.1; cursor: pointer; box-shadow: 0 2px 0 #3a2410; display: grid; justify-items: center; }
+.peg small { font-family: var(--f-body); font-size: 10px; color: #f0d9b5; }
+.peg.last { outline: 2px solid var(--shu); outline-offset: 1px; }
+.mokulab { display: flex; justify-content: space-between; font-size: 11px; color: #6b5a44; }
+.panel { background: rgba(0,0,0,.25); border-radius: 8px; padding: 10px 12px; display: grid; gap: 8px; }
+.lab { font-size: 12px; color: var(--dim); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid rgba(239,230,210,.25); background: transparent; color: var(--text); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 700; }
+.chip:focus-visible, .peg:focus-visible, .btn:focus-visible, .slot:focus-visible, .num:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.guide { font-size: 13px; color: var(--paper); background: rgba(216,169,72,.1); border-left: 3px solid var(--gold); padding: 6px 10px; border-radius: 4px; }
+.slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.slot { border: 2px dashed rgba(239,230,210,.35); background: rgba(0,0,0,.2); color: var(--text); border-radius: 6px; padding: 6px 0; display: grid; justify-items: center; gap: 2px; font: inherit; cursor: pointer; min-height: 92px; }
+.slot.on { border-style: solid; border-color: var(--gold); background: var(--paper); color: var(--ink); }
+.slot .pos { font-size: 12px; font-weight: 700; }
+.slot .n { font-family: var(--f-brush); font-size: 34px; line-height: 1; min-height: 34px; }
+.slot .pay { font-size: 12px; color: inherit; opacity: .85; font-variant-numeric: tabular-nums; }
+.slot.hit { box-shadow: 0 0 0 3px var(--win), 0 0 16px var(--win); }
+.slot[disabled] { opacity: .25; cursor: default; }
+.nums { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.num { border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 4px; font-family: var(--f-brush); font-size: 28px; padding: 6px 0; cursor: pointer; }
+.num.used { opacity: .3; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.btn { border: 0; border-radius: 8px; padding: 11px 18px; font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; background: var(--shu); color: #fff; letter-spacing: .1em; }
+.btn.sub { background: transparent; border: 1px solid rgba(239,230,210,.3); color: var(--text); font-weight: 500; letter-spacing: 0; font-size: 13px; padding: 7px 12px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.hist { display: flex; gap: 4px; flex-wrap: wrap; font-family: var(--f-brush); font-size: 18px; }
+.hist span { width: 26px; text-align: center; background: rgba(239,230,210,.08); border-radius: 3px; }
+details { background: rgba(0,0,0,.22); border-radius: 8px; padding: 8px 12px; }
+details summary { cursor: pointer; color: var(--gold); font-weight: 700; }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 4px 6px; border-bottom: 1px solid rgba(239,230,210,.1); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+.fine { font-size: 12px; color: var(--dim); }
+input[type=number] { width: 4.5em; font: inherit; background: var(--wood); color: var(--text); border: 1px solid rgba(239,230,210,.3); border-radius: 4px; padding: 2px 6px; }
+@media (prefers-reduced-motion: reduce) { .kamishita .cloth { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header><h1>手本引き<small id="ver"></small></h1><div class="credit">持ち点 <b id="credit">0</b> P</div></header>
+  <div id="authBar"></div>
+  <section class="bon" aria-label="盆">
+    <div class="dou">
+      <div class="kamishita" id="kami"><div class="kuri" id="kuri"></div><div class="cloth"></div></div>
+      <div><div class="who" id="who"></div><div class="msg" id="msg">張り方と目を選んで、張ってください</div><div class="fine" id="res" style="color:#5a4a36"></div></div>
+    </div>
+    <div>
+      <div class="mokulab"><span>← 大戻（しばらく出ていない）</span><span>根（いま出た目）→</span></div>
+      <div class="moku" id="moku"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="lab">張り方</div>
+    <div id="betGroups" style="display:grid;gap:6px"></div>
+    <div class="guide" id="guide"></div>
+    <div class="lab">張札（目を押すと大→中→止→角の順に入ります。入った札を押すと外せます）</div>
+    <div class="slots" id="slots"></div>
+    <div class="nums" id="nums"></div>
+    <div class="row"><div><div class="lab">張る額</div><div class="chips" id="stakes"></div></div>
+      <div style="display:flex;gap:8px"><button class="btn sub" type="button" id="clear">札を外す</button><button class="btn" type="button" id="go">張る</button></div></div>
+    <div class="fine" id="preview"></div>
+  </section>
+
+  <section class="panel"><div class="lab">この胴が引いた目（新しい順）</div><div class="hist" id="hist"></div></section>
+
+  <details><summary>張り方の一覧と配当</summary><div class="tbl" id="betTable"></div>
+    <p class="fine">数字は張った額に対する儲けの倍率。「種」は張った額がそのまま戻る、マイナスは張った額のその割合を取られる。張った目が出なければ張った額を失う。「戻り」は胴がでたらめに引いたときの、張った額に対する平均の戻り。勝ったときは儲けから寺銭を引く（10P未満は切り捨て）。</p></details>
+  <details><summary>目木の読み方</summary>
+    <p class="fine">胴は目を引くたびに、その目の駒を右端（根）へ寄せます。右から順に<b>根・小戻・三間・四間・古付・大戻</b>と呼び、右ほど最近に出た目、左ほどしばらく出ていない目です。右の二つを<b>口</b>、真ん中の二つを<b>中綱</b>、左の二つを<b>奥</b>とも言います。</p>
+    <p class="fine">胴は自分の意思で札を選ぶので、引き方には癖が出ます。続けて同じ目を引くのか、しばらく出ていない目に戻るのか、真ん中に寄るのか。目木の並びと、この胴が引いてきた目からそれを読むのが手本引きです。胴は一本（30回）ごとに代わり、代わると癖も目木も変わります。</p></details>
+  <details><summary>道具と言葉</summary>
+    <p class="fine"><b>繰札</b>：一〜六の6枚。胴はこの中から1枚を選ぶ。<b>紙下</b>：選んだ札を隠す手拭い。<b>目木</b>：引いた目の順番を残す6本の駒。<b>張札</b>：張り子が張る目を示す札。<b>盆茣蓙</b>：勝負をする白い布。<b>胴</b>：札を引く親。<b>張り子</b>：張る客。<b>合力</b>：配当を付けて払う進行役。<b>寺銭</b>：場の取り分。</p>
+    <p class="fine">手本引きは主に関西の賭場で好まれた遊びです。この画面は、その遊び方と言葉を残すための再現で、張り方と配当は資料の値（スイチ4.5倍、角−0.2など）に合わせています。賭場によって決まりは違いました。</p></details>
+  <details><summary>設定（店側）</summary><div id="setup"></div></details>
+</div>
+<script src="../tools/supabase.js"></script>
+<script src="../tools/tamariba.js"></script>
+<script>
+// 手本引き：張り方・配当・精算・胴（コンピューター）の引き方。ブラウザと Node の両方で動く。
+(function (root) {
+  "use strict";
+  // 張り方。pays = 大・中・止・角 の順の「儲けの倍率」（0 = 種＝張った額が戻る、負 = 一部を取られる）。外れは張った額を失う。
+  var BETS = [
+    { id: "suichi", name: "スイチ", pays: [4.5], guide: "1枚に絞る大勝負。当たれば張った額の4.5倍の儲け。読み切ったときの張り方。" },
+    { id: "kettatsu", name: "ケッタツ", pays: [3.5, 0], guide: "本命を大に、押さえを中に。中で当たると張った額がそのまま戻る（種）。" },
+    { id: "saburoku", name: "サブロク", pays: [3, 0.5], guide: "大で3倍、中でも0.5倍の儲け。2枚張りで中にも儲けを残したいとき。" },
+    { id: "guni", name: "グニ", pays: [2.5, 1], guide: "大2.5倍・中1倍。2枚のどちらでもしっかり儲けたいとき。" },
+    { id: "yamapon", name: "ヤマポン", pays: [2.8, 0, 0], guide: "3枚張りの大勝負型。大に賭け、中・止は種で守る。" },
+    { id: "pinchukitsukara", name: "ピンチュウキツカラ", pays: [2, 0.8, 0], guide: "大2倍・中0.8倍・止は種。大と中の2枚に重みを置く。" },
+    { id: "rokusanpin", name: "ロクサンピン", pays: [2, 0.6, 0.2], guide: "大2倍・中0.6倍・止0.2倍。3枚すべてで少しずつ儲けが出る。" },
+    { id: "pinchu", name: "ピンチュウ", pays: [1.5, 1.3, 0], guide: "大1.5倍・中1.3倍。大と中をほぼ同じ重さで張る。止は種。" },
+    { id: "kuichi", name: "クイチ", pays: [1.5, 1, 0.3], guide: "大1.5倍・中1倍・止0.3倍。3枚に順に重みを付ける。" },
+    { id: "teppou", name: "テッポウ", pays: [1, 1, 0.8], guide: "3枚ほぼ均等。3つのどれが来ても儲かる。" },
+    { id: "soudai", name: "ソウダイ", pays: [2, 0, 0, -0.2], guide: "4枚張りで大だけ2倍。中・止は種、角で当たると張った額の2割を取られる。" },
+    { id: "kitsubari", name: "キツ張り", pays: [1.4, 0.6, 0, -0.2], guide: "大1.4倍・中0.6倍・止は種・角は−0.2。" },
+    { id: "yasubari", name: "安張り", pays: [1.2, 0.6, 0.2, -0.2], guide: "いちばんよく使われた4枚張り。大1.2倍・中0.6倍・止0.2倍・角は−0.2。" },
+    { id: "tonpachi", name: "トンパチ", pays: [1, 0.8, 0.2, -0.2], guide: "大1倍・中0.8倍・止0.2倍・角は−0.2。大と中を近い重さで。" },
+    { id: "hakobari", name: "箱張り", pays: [1, 1, -0.1, -0.1], guide: "大・中が1倍、止・角は−0.1。2枚が本命、2枚は外れたときの損を減らす押さえ。" }
+  ];
+  var SLOT = ["大", "中", "止", "角"];
+  // 目木の位置の呼び名（右端＝いちばん最近に引いた目から）
+  var MOKU = ["根", "小戻", "三間", "四間", "古付", "大戻"];
+  var KANJI = ["", "一", "二", "三", "四", "五", "六"];
+  function bet(id) { for (var i = 0; i < BETS.length; i++) if (BETS[i].id === id) return BETS[i]; return null; }
+  // 胴がでたらめに引いたときの張り子の戻り（張った額に対する割合）
+  function fairReturn(b) { var s = 0; b.pays.forEach(function (m) { s += (m + 1) / 6; }); return s; }
+  // 精算。nums[i] = 位置 i（大・中・止・角）に張った目。stake = 張った額。tera = 寺銭の割合（0.01〜0.05）
+  // 寺銭は儲けが出たときだけ、儲けに掛けて10P未満を切り捨て（端数はお客さんの得）
+  function settle(b, nums, stake, drawn, tera) {
+    var at = nums.indexOf(drawn);
+    if (at < 0) return { hit: -1, gross: -stake, tera: 0, net: -stake };
+    var gross = Math.round(stake * b.pays[at]);
+    var t = gross > 0 ? Math.floor(gross * tera / 10) * 10 : 0;
+    return { hit: at, gross: gross, tera: t, net: gross - t };
+  }
+  // ---- 胴の癖 ----
+  // 胴は「目木のどの位置の目を引くか」に好みを持つ。w[6] = 根・小戻・三間・四間・古付・大戻 を選ぶ確率。
+  // 完全に読み切ったお客さんでも、どの張り方でも戻りが limit を超えないところまで癖の強さを抑える。
+  function bestReturn(p, tera) {   // 位置ごとの確率 p を知っている人が、いちばん得な張り方・並べ方をしたときの戻り（寺銭込み）
+    tera = tera || 0;
+    var sorted = p.slice().sort(function (a, b) { return b - a; }), best = 0, bestBet = null;
+    BETS.forEach(function (b) {
+      var ms = b.pays.map(function (m) { return m > 0 ? m * (1 - tera) : m; }).sort(function (a, c) { return c - a; }), r = 0;
+      for (var i = 0; i < ms.length; i++) r += sorted[i] * (ms[i] + 1);
+      if (r > best) { best = r; bestBet = b.name; }
+    });
+    return { ret: best, bet: bestBet };
+  }
+  var STYLES = [
+    { id: "kaeshi", name: "戻し好き", desc: "しばらく引いていない目（古付・大戻）に戻りたがる", w: [0.2, 0.6, 0.9, 1.1, 1.5, 1.7] },
+    { id: "chikame", name: "近目好き", desc: "最近引いた目のそば（小戻・三間）を引きたがる", w: [0.6, 1.6, 1.5, 1.0, 0.7, 0.6] },
+    { id: "nakana", name: "中綱好き", desc: "真ん中（三間・四間）に寄りがち", w: [0.7, 0.9, 1.5, 1.5, 0.8, 0.6] },
+    { id: "neba", name: "根張り", desc: "同じ目を続けて引くことをいとわない", w: [1.8, 1.1, 0.9, 0.8, 0.7, 0.7] }
+  ];
+  function styleProbs(style, strength) {   // strength 0 = でたらめ, 1 = 癖のまま
+    var s = 0, w = style.w.map(function (x) { var v = 1 + (x - 1) * strength; s += v; return v; });
+    return w.map(function (v) { return v / s; });
+  }
+  // limit を超えない最大の強さ（二分探索）
+  function capStrength(style, limit, tera) {
+    var lo = 0, hi = 1;
+    if (bestReturn(styleProbs(style, 1), tera).ret <= limit) return 1;
+    for (var i = 0; i < 40; i++) { var mid = (lo + hi) / 2; if (bestReturn(styleProbs(style, mid), tera).ret <= limit) lo = mid; else hi = mid; }
+    return lo;
+  }
+  // order[k] = 目木の位置 k（0 = 根）にある目
+  function draw(order, probs, r) {
+    var x = r(), acc = 0;
+    for (var k = 0; k < 6; k++) { acc += probs[k]; if (x < acc) return order[k]; }
+    return order[5];
+  }
+  function moveMoku(order, n) { var o = order.filter(function (x) { return x !== n; }); o.unshift(n); return o; }   // 引いた目を根（右端）へ
+  root.Honbiki = { BETS: BETS, SLOT: SLOT, MOKU: MOKU, KANJI: KANJI, bet: bet, fairReturn: fairReturn, settle: settle,
+    STYLES: STYLES, styleProbs: styleProbs, bestReturn: bestReturn, capStrength: capStrength, draw: draw, moveMoku: moveMoku };
+})(typeof window !== "undefined" ? window : globalThis);
+if (typeof module !== "undefined") module.exports = globalThis.Honbiki;
+
+</script>
+<script>
+(function () {
+  "use strict";
+  var B = window.Honbiki, $ = function (id) { return document.getElementById(id); };
+  var VERSION = "v1", TENURE = 30, STAKES = [100, 500, 1000, 5000, 10000];
+  function fmt(n) { return Math.round(n).toLocaleString(); }
+  function shuffled() { var a = [1, 2, 3, 4, 5, 6]; for (var i = 5; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  // ---- one record, saved in one step ----
+  function load() { try { return JSON.parse(localStorage.getItem("honbikiState") || "null"); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem("honbikiState", JSON.stringify(S)); } catch (e) { return false; } if (window.TAMARIBA) TAMARIBA.wallet.sync(); return true; }
+  var S = load() || { v: 1, credit: 100000, set: { tera: 3, limit: 100 }, dou: null, order: null, hidden: null, hist: [], ui: { bet: "yasubari", stake: 1000, nums: [] } };
+  function newDou() {
+    var st = B.STYLES[Math.floor(Math.random() * B.STYLES.length)];
+    var gen = S.dou ? S.dou.gen + 1 : 1;
+    S.dou = { gen: gen, style: st.id, n: 0 };
+    S.order = shuffled(); S.hist = [];
+  }
+  function probs() {
+    var st = B.STYLES.filter(function (x) { return x.id === S.dou.style; })[0];
+    var k = B.capStrength(st, S.set.limit / 100, S.set.tera / 100);
+    return B.styleProbs(st, k);
+  }
+  // the dealer's card for this round is chosen BEFORE you bet, and saved, so a reload cannot change it
+  function prepare() {
+    if (!S.dou || S.dou.n >= TENURE) newDou();
+    if (S.hidden == null) S.hidden = B.draw(S.order, probs(), Math.random);
+    save();
+  }
+  // ---- rendering ----
+  function curBet() { return B.bet(S.ui.bet) || B.BETS[0]; }
+  function payText(m) { return m === 0 ? "種" : (m > 0 ? "+" : "") + m + "倍"; }
+  function render() {
+    $("credit").textContent = fmt(S.credit);
+    $("who").innerHTML = "胴 <b>" + S.dou.gen + "代目</b>　" + (S.dou.n) + " / " + TENURE + " 回　寺銭 " + S.set.tera + "%";
+    var m = $("moku"); m.innerHTML = "";
+    for (var k = 5; k >= 0; k--) {
+      var n = S.order[k], b = document.createElement("button");
+      b.type = "button"; b.className = "peg" + (k === 0 && S.hist.length ? " last" : "");
+      b.innerHTML = B.KANJI[n] + "<small>" + B.MOKU[k] + "</small>"; b.setAttribute("aria-label", B.MOKU[k] + "：" + n);
+      (function (num) { b.addEventListener("click", function () { addNum(num); }); })(n);
+      m.appendChild(b);
+    }
+    // bet types grouped by number of cards
+    var g = $("betGroups"); g.innerHTML = "";
+    [1, 2, 3, 4].forEach(function (c) {
+      var row = document.createElement("div"); row.className = "chips";
+      row.innerHTML = '<span class="fine" style="width:3.5em">' + c + "枚</span>" + B.BETS.filter(function (b) { return b.pays.length === c; }).map(function (b) { return '<button class="chip" type="button" data-bet="' + b.id + '" aria-pressed="' + (b.id === S.ui.bet) + '">' + b.name + "</button>"; }).join("");
+      g.appendChild(row);
+    });
+    g.querySelectorAll("[data-bet]").forEach(function (el) { el.addEventListener("click", function () { if (busy) return; S.ui.bet = el.dataset.bet; S.ui.nums = S.ui.nums.slice(0, curBet().pays.length); save(); render(); }); });
+    var b = curBet();
+    $("guide").innerHTML = "<b>" + b.name + "</b>（" + b.pays.length + "枚）：" + b.guide + "<br><span class=\"fine\">戻り（でたらめな胴に対して）" + (B.fairReturn(b) * 100).toFixed(1) + "%</span>";
+    var sl = $("slots"); sl.innerHTML = "";
+    for (var i = 0; i < 4; i++) {
+      var on = i < b.pays.length, num = S.ui.nums[i], el = document.createElement("button");
+      el.type = "button"; el.className = "slot" + (num ? " on" : ""); el.disabled = !on || busy;
+      el.innerHTML = '<span class="pos">' + B.SLOT[i] + '</span><span class="n">' + (num ? B.KANJI[num] : "") + '</span><span class="pay">' + (on ? payText(b.pays[i]) : "—") + "</span>";
+      (function (idx) { el.addEventListener("click", function () { if (busy) return; S.ui.nums.splice(idx, 1); save(); render(); }); })(i);
+      sl.appendChild(el);
+    }
+    var nu = $("nums"); nu.innerHTML = "";
+    for (var n2 = 1; n2 <= 6; n2++) {
+      var e2 = document.createElement("button"); e2.type = "button"; e2.className = "num" + (S.ui.nums.indexOf(n2) >= 0 ? " used" : ""); e2.textContent = B.KANJI[n2]; e2.disabled = busy;
+      (function (num) { e2.addEventListener("click", function () { addNum(num); }); })(n2);
+      nu.appendChild(e2);
+    }
+    $("stakes").innerHTML = STAKES.map(function (x) { return '<button class="chip" type="button" data-stake="' + x + '" aria-pressed="' + (x === S.ui.stake) + '">' + fmt(x) + "</button>"; }).join("");
+    $("stakes").querySelectorAll("[data-stake]").forEach(function (el) { el.addEventListener("click", function () { if (busy) return; S.ui.stake = +el.dataset.stake; save(); render(); }); });
+    var ready = S.ui.nums.length === b.pays.length;
+    $("go").disabled = busy || !ready || S.credit < S.ui.stake;
+    $("preview").textContent = ready ? b.pays.map(function (m, i) { var gross = Math.round(S.ui.stake * m); return B.SLOT[i] + "（" + B.KANJI[S.ui.nums[i]] + "）で " + (gross > 0 ? "+" + fmt(gross) : gross === 0 ? "±0" : "−" + fmt(-gross)) + " P"; }).join("　") + "　外れ −" + fmt(S.ui.stake) + " P" + (S.credit < S.ui.stake ? "（持ち点が足りません）" : "") : "あと " + (b.pays.length - S.ui.nums.length) + " 枚選んでください";
+    $("hist").innerHTML = S.hist.length ? S.hist.slice().reverse().map(function (n) { return "<span>" + B.KANJI[n] + "</span>"; }).join("") : '<span class="fine" style="width:auto">まだありません</span>';
+  }
+  function addNum(n) {
+    if (busy) return;
+    var b = curBet();
+    if (S.ui.nums.indexOf(n) >= 0) { S.ui.nums = S.ui.nums.filter(function (x) { return x !== n; }); }
+    else if (S.ui.nums.length < b.pays.length) S.ui.nums.push(n);
+    save(); render();
+  }
+  var busy = false;
+  if (window.TAMARIBA) TAMARIBA.wallet.attach({ game: "tehonbiki", get: function () { return S.credit; }, set: function (v) { S.credit = v; save(); render(); }, busy: function () { return busy; } });
+  function msg(t, cls) { $("msg").textContent = t; $("msg").className = "msg" + (cls ? " " + cls : ""); }
+  $("clear").addEventListener("click", function () { if (busy) return; S.ui.nums = []; save(); render(); });
+  $("go").addEventListener("click", function () {
+    var b = curBet(); if (busy || S.ui.nums.length !== b.pays.length || S.credit < S.ui.stake) return;
+    busy = true;
+    var drawn = S.hidden, r = B.settle(b, S.ui.nums.slice(), S.ui.stake, drawn, S.set.tera / 100);
+    // settle and move on in one saved step (the reveal below is only the show)
+    S.credit += r.net; S.order = B.moveMoku(S.order, drawn); S.hist.push(drawn); S.dou.n++; S.hidden = null;
+    S.last = { bet: b.id, nums: S.ui.nums.slice(), stake: S.ui.stake, drawn: drawn, r: r };
+    if (!save()) { S = load(); busy = false; msg("保存できないため張れませんでした", "lose"); render(); return; }
+    $("kuri").textContent = B.KANJI[drawn];
+    $("kami").classList.add("open"); msg("……", "");
+    render();
+    setTimeout(function () {
+      if (r.hit >= 0) document.querySelectorAll("#slots .slot")[r.hit].classList.add("hit");
+      if (r.net > 0) msg("当たり（" + B.SLOT[r.hit] + "）　+" + fmt(r.net) + " P", "win");
+      else if (r.hit >= 0) msg((r.net === 0 ? "種（" : "当たり（") + B.SLOT[r.hit] + "）　" + (r.net === 0 ? "±0" : "−" + fmt(-r.net)) + " P", r.net === 0 ? "" : "lose");
+      else msg("外れ　−" + fmt(S.last.stake) + " P", "lose");
+      $("res").textContent = "出た目：" + B.KANJI[drawn] + (r.tera ? "　寺銭 " + fmt(r.tera) + " P" : "");
+      setTimeout(function () {
+        $("kami").classList.remove("open"); busy = false;
+        var changed = S.dou.n >= TENURE;
+        prepare(); render();
+        if (changed) msg("胴が代わりました（" + S.dou.gen + "代目）。目木も新しくなります", "");
+      }, 1600);
+    }, 700);
+  });
+  // ---- tables ----
+  $("betTable").innerHTML = "<table><tr><th>張り方</th><th>枚</th><th>大</th><th>中</th><th>止</th><th>角</th><th>戻り</th></tr>" + B.BETS.map(function (b) {
+    return "<tr><td>" + b.name + "</td><td>" + b.pays.length + "</td>" + [0, 1, 2, 3].map(function (i) { return "<td>" + (i < b.pays.length ? (b.pays[i] === 0 ? "種" : b.pays[i]) : "") + "</td>"; }).join("") + "<td>" + (B.fairReturn(b) * 100).toFixed(1) + "%</td></tr>";
+  }).join("") + "</table>";
+  function setupRender() {
+    var rows = B.STYLES.map(function (st) {
+      var k = B.capStrength(st, S.set.limit / 100, S.set.tera / 100), p = B.styleProbs(st, k), br = B.bestReturn(p, S.set.tera / 100);
+      return "<tr><td>" + st.name + '<div class="fine">' + st.desc + "</div></td>" + p.map(function (x) { return "<td>" + (x * 100).toFixed(1) + "</td>"; }).join("") + "<td>" + (br.ret * 100).toFixed(1) + "%</td></tr>";
+    }).join("");
+    $("setup").innerHTML = '<p class="fine">寺銭（勝った儲けから）：<input id="tera" type="number" min="1" max="5" step="1" value="' + S.set.tera + '"> %　（10P未満は切り捨て）</p>' +
+      '<p class="fine">胴の癖の上限：完全に読み切ったお客さんの戻りが <input id="limit" type="number" min="95" max="110" step="1" value="' + S.set.limit + '"> % を超えない強さまで</p>' +
+      '<div class="tbl"><table><tr><th>胴の癖</th><th>根</th><th>小戻</th><th>三間</th><th>四間</th><th>古付</th><th>大戻</th><th>読み切った客の戻り</th></tr>' + rows + "</table></div>" +
+      '<p class="fine">数字は胴がその位置の目を引く確率（%）。でたらめなら各16.7%。上限を上げるほど癖が読みやすくなり、読める客ほど得をします。100%以下なら、どれだけ読まれても店が平均で負けることはありません。</p>';
+    $("tera").addEventListener("change", function () { S.set.tera = Math.max(1, Math.min(5, Math.round(+this.value || 3))); save(); setupRender(); render(); });
+    $("limit").addEventListener("change", function () { S.set.limit = Math.max(95, Math.min(110, Math.round(+this.value || 100))); save(); setupRender(); });
+  }
+  setupRender();
+  $("ver").textContent = VERSION;
+  prepare(); render();
+})();
+
+</script>
+
+</body></html>
